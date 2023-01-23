@@ -6,6 +6,7 @@ namespace mediatorCqrs.UnitTest
         public void Test1()
         {
             //salam
+            //test2
 
         }
     }
