@@ -13,7 +13,7 @@ namespace mediatorCqrs.Application.Persistance.Contracts
         Task<IReadOnlyList<T>> GetAll();
         Task<T> Create(T entity);
         Task Update(T entity);
-        Task Delete(T entity);
+        Task<bool> Delete(T entity);
 
     }
 }

@@ -36,5 +36,13 @@ namespace mediatorandCqrs.API
             return Ok(response);
 
         }
+
+        [HttpDelete("DeleteUser")]
+        public async Task<ActionResult<bool>> Delete([FromBody] UserDtos user)
+        {
+            var command = new DeleteUserCommand { userDtos = user };
+            var response = await _mediator.Send(command);
+            return Ok(response);
+        }
     }
 }

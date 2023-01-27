@@ -5,53 +5,46 @@ using mediatorCqrs.Application.Persistance.Contracts;
 using mediatorCqrs.Application.Profiles;
 using mediatorCqrs.UnitTest.Mock;
 using Moq;
-using Shouldly;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace mediatorCqrs.UnitTest.Users.Command
 {
-
-    public class CreateUserCommandTest
+    public class DeleteUserCommandTest
     {
         private readonly IMapper _mapper;
         private readonly Mock<IUserRepository> _mockrepo;
-        private readonly CreateUserDtos _createuserDtos;
+        private readonly UserDtos _userDtos;
 
-        public CreateUserCommandTest()
+        public DeleteUserCommandTest()
         {
             _mockrepo = MockUserRepository.GetUserRepository();
-
-            var mapperConfig = new MapperConfiguration(r =>
+            var mappinConfig = new MapperConfiguration(r =>
             {
                 r.AddProfile<MappingProfile>();
             });
-            _mapper = mapperConfig.CreateMapper();
-            _createuserDtos = new CreateUserDtos()
+            _mapper = mappinConfig.CreateMapper();
+            _userDtos = new UserDtos()
             {
-                
+                Id= 1,  
                 DateTime = DateTime.Now,
                 email = " alich@",
                 isActive = true,
                 lastName = " ch",
                 name = " ali"
-
             };
         }
 
         [Fact]
-        public async Task CreateUser()
+        public async Task DeleteUserTest()
         {
-            var handler = new CreateUserCommandHandler(_mockrepo.Object, _mapper);
-            var result = handler.Handle(new CreateUserCommand() { createUserDtos = _createuserDtos }
-            , CancellationToken.None);
-            var User = await _mockrepo.Object.GetAll();
-            User.Count.ShouldBe(3);
-
-
-
+            var handler = new DeleteUserCommandHandler(_mockrepo.Object,_mapper);
+            var result =await handler.Handle(new DeleteUserCommand { userDtos = _userDtos} ,
+                CancellationToken.None);
+            Assert.Equal(true, result);
         }
-
-
-
-
     }
 }

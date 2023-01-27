@@ -16,8 +16,4 @@
     <ProjectReference Include="..\mediatorCqrs.Domain\mediatorCqrs.Domain.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Features\User\Requests\Commands\" />
-  </ItemGroup>
-
 </Project>

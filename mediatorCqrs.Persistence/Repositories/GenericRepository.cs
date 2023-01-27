@@ -1,10 +1,5 @@
 ﻿using mediatorCqrs.Application.Persistance.Contracts;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace mediatorCqrs.Persistence.Repositories
 {
@@ -25,9 +20,15 @@ namespace mediatorCqrs.Persistence.Repositories
             return entity;
         }
 
-        public Task Delete(T entity)
+        public async Task<bool> Delete(T entity)
         {
-            throw new NotImplementedException();
+           if(entity != null)
+            {
+                _Dbset.Remove(entity);
+                await _context.SaveChangesAsync();
+                return true;
+            }
+           return false ;
         }
 
         public async Task<IReadOnlyList<T>> GetAll()

@@ -32,6 +32,12 @@ namespace mediatorCqrs.UnitTest.Mock
             };
             var mockRepo = new Mock<IUserRepository>();
             mockRepo.Setup(r => r.GetAll()).ReturnsAsync(users);
+            mockRepo.Setup(r=> r.Delete(It.IsAny<User>()))
+                .ReturnsAsync((User user) =>
+                 {
+                     users.Remove(user);
+                     return true;
+                 });
 
             mockRepo.Setup(r => r.Create(It.IsAny<User>()))
                 .ReturnsAsync((User user) =>
