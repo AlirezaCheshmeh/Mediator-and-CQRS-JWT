@@ -7,11 +7,12 @@ using System.Threading.Tasks;
 
 namespace mediatorCqrs.Application.DTOs
 {
-    public class CreateUserDtos :BaseDTO
+    public class CreateUserDtos 
     {
         public string name { get; set; }
         public string email { get; set; }
         public string lastName { get; set; }
         public bool isActive { get; set; }
+        public DateTime DateTime { get; set; }
     }
 }
