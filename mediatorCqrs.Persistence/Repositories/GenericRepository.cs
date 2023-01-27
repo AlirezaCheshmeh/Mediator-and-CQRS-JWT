@@ -20,7 +20,7 @@ namespace mediatorCqrs.Persistence.Repositories
         }
         public async  Task<T> Create(T entity)
         {
-            _Dbset.Add(entity);
+            _Dbset.AddAsync(entity);
              await _context.SaveChangesAsync();
             return entity;
         }

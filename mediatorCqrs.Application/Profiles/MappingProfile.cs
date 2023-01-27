@@ -14,7 +14,7 @@ namespace mediatorCqrs.Application.Profiles
         public MappingProfile()
         {
             CreateMap<User , UserDtos>().ReverseMap();
-            CreateMap<User , CreateUserDtos>().ReverseMap();
+            CreateMap<CreateUserDtos , User>();
         }
     }
 }
