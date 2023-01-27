@@ -34,10 +34,10 @@ namespace mediatorCqrs.UnitTest.Mock
             mockRepo.Setup(r => r.GetAll()).ReturnsAsync(users);
 
             mockRepo.Setup(r => r.Create(It.IsAny<User>()))
-                .Returns((User user) =>
+                .ReturnsAsync((User user) =>
                 {
                     users.Add(user);
-                    return Task.CompletedTask;
+                    return user;
                 });
             return mockRepo;
         }

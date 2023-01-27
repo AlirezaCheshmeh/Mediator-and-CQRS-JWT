@@ -29,8 +29,4 @@
     <ProjectReference Include="..\mediatorCqrs.Persistence\mediatorCqrs.Persistence.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Users\Command\" />
-  </ItemGroup>
-
 </Project>

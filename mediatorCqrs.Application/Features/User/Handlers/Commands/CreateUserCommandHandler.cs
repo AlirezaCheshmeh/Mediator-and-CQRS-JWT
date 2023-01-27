@@ -1,19 +1,26 @@
-﻿using mediatorCqrs.Application.Features.User.Requests.Commands;
+﻿using AutoMapper;
+using mediatorCqrs.Application.Features.User.Requests.Commands;
+using mediatorCqrs.Application.Persistance.Contracts;
+using mediatorCqrs.Domain;
 using MediatR;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace mediatorCqrs.Application.Features.User.Handlers.Commands
+
+public class CreateUserCommandHandler : IRequestHandler<CreateUserCommand, int>
 {
-    public class CreateUserCommandHandler : IRequestHandler<CreateUserCommand, int>
+    private readonly IUserRepository _userRepository;
+    private readonly IMapper _mapper;
+
+    public CreateUserCommandHandler(IUserRepository userRepository, IMapper mapper)
     {
-        public async Task<int> Handle(CreateUserCommand request, CancellationToken cancellationToken)
-        {
-            var r = 12;
-            return  r ;
-        }
+        _userRepository = userRepository;
+        _mapper = mapper;
+    }
+    public async Task<int> Handle(CreateUserCommand request, CancellationToken cancellationToken)
+    {
+        var user = _mapper.Map<User>(request.createUserDtos);
+        var r =  _userRepository.Create(user);
+        return r.Id;
+
     }
 }
+

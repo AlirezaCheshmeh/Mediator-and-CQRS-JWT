@@ -10,6 +10,6 @@ namespace mediatorCqrs.Application.Features.User.Requests.Commands
 {
     public class CreateUserCommand : IRequest<int>
     {
-        public UserDtos UserDtos { get; set; }
+        public CreateUserDtos createUserDtos { get; set; }
     }
 }
