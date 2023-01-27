@@ -23,4 +23,10 @@
     </PackageReference>
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\mediatorCqrs.Application\mediatorCqrs.Application.csproj" />
+    <ProjectReference Include="..\mediatorCqrs.Domain\mediatorCqrs.Domain.csproj" />
+    <ProjectReference Include="..\mediatorCqrs.Persistence\mediatorCqrs.Persistence.csproj" />
+  </ItemGroup>
+
 </Project>

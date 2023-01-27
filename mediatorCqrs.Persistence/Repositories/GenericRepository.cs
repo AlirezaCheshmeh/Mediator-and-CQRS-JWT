@@ -18,10 +18,11 @@ namespace mediatorCqrs.Persistence.Repositories
             _context = context;
             _Dbset = context.Set<T>();
         }
-        public async Task Create(T entity)
+        public async  Task<T> Create(T entity)
         {
             _Dbset.Add(entity);
              await _context.SaveChangesAsync();
+            return entity;
         }
 
         public Task Delete(T entity)

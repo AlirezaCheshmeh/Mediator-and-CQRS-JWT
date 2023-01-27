@@ -11,7 +11,7 @@ namespace mediatorCqrs.Application.Persistance.Contracts
     {
         Task<T> GetbyID(int ID);
         Task<IReadOnlyList<T>> GetAll();
-        Task Create(T entity);
+        Task<T> Create(T entity);
         Task Update(T entity);
         Task Delete(T entity);
 

@@ -1,3 +1,5 @@
+using mediatorCqrs.Domain;
+
 namespace mediatorCqrs.UnitTest
 {
     public class UnitTest1
@@ -5,9 +7,7 @@ namespace mediatorCqrs.UnitTest
         [Fact]
         public void Test1()
         {
-            //salam
-            //test2
-
+           
         }
     }
 }

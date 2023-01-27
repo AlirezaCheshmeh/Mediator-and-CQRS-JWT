@@ -25,7 +25,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "mediatorandCqrs.API", "medi
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "mediatorCqrs.Infrastructrue", "mediatorCqrs.Infrastructrue\mediatorCqrs.Infrastructrue.csproj", "{B5414E51-5F26-4CEE-90AF-35321B9BAAA6}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "mediatorCqrs.UnitTest", "mediatorCqrs.UnitTest\mediatorCqrs.UnitTest.csproj", "{65BE2A6E-D8CC-481D-990C-94696FF45F3E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "mediatorCqrs.UnitTest", "mediatorCqrs.UnitTest\mediatorCqrs.UnitTest.csproj", "{65BE2A6E-D8CC-481D-990C-94696FF45F3E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
