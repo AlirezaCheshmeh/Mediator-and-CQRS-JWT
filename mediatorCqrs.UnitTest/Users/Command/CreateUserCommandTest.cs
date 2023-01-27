@@ -41,15 +41,12 @@ namespace mediatorCqrs.UnitTest.Users.Command
         public async Task CreateUser()
         {
             var handler = new CreateUserCommandHandler(_mockrepo.Object, _mapper);
-            var result = handler.Handle(new CreateUserCommand() { createUserDtos = _createuserDtos}
+            var result = handler.Handle(new CreateUserCommand() { createUserDtos = _createuserDtos }
             , CancellationToken.None);
             var User = await _mockrepo.Object.GetAll();
-
-
-           
             User.Count.ShouldBe(2);
 
-           
+
 
         }
 
