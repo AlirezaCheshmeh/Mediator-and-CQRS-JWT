@@ -22,16 +22,16 @@ namespace mediatorandCqrs.API
         [HttpGet("GetUserList")]
         public async Task<ActionResult<UserDtos>> GetUserList()
         {
-            var UserList =await _mediator.Send(new GetUserListRequest());
+            var UserList = await _mediator.Send(new GetUserListRequest());
             return Ok(UserList);
         }
 
 
 
         [HttpPost("CraeteUser")]
-        public async Task<ActionResult<int>> Create([FromBody]CreateUserDtos user)
+        public async Task<ActionResult<int>> Create([FromBody] CreateUserDtos user)
         {
-            var command = new CreateUserCommand{ createUserDtos = user};
+            var command = new CreateUserCommand { createUserDtos = user };
             var response = await _mediator.Send(command);
             return Ok(response);
 
@@ -43,6 +43,20 @@ namespace mediatorandCqrs.API
             var command = new DeleteUserCommand { userDtos = user };
             var response = await _mediator.Send(command);
             return Ok(response);
+        }
+
+
+        [HttpGet("GetUserByID{id}")]
+        public async Task<ActionResult<UserDtos>> GetByID(int id)
+        {
+            var Query = new GetUserDetailRequest { Id = id };
+            var respponse = await _mediator.Send(Query);
+            if(respponse != null)
+            {
+                return Ok(respponse);
+            }
+            return BadRequest("user not found");
+            
         }
     }
 }

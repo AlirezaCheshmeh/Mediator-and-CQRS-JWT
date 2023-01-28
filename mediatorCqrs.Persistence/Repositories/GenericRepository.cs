@@ -1,5 +1,6 @@
 ﻿using mediatorCqrs.Application.Persistance.Contracts;
 using Microsoft.EntityFrameworkCore;
+using System.Linq.Expressions;
 
 namespace mediatorCqrs.Persistence.Repositories
 {
@@ -36,14 +37,22 @@ namespace mediatorCqrs.Persistence.Repositories
            return await _Dbset.ToListAsync();
         }
 
-        public Task<T> GetbyID(int ID)
+        public async Task<T> GetbyID(Expression<Func<T , bool>> expression)
         {
-            throw new NotImplementedException();
+            var user =await _Dbset.FirstOrDefaultAsync(expression);
+            return user;
         }
 
-        public Task Update(T entity)
+        public bool  Update(T entity)
         {
-            throw new NotImplementedException();
+            if (entity != null)
+            {
+                _Dbset.Update(entity);
+                _context.SaveChanges();
+                return true;
+            }
+            return false;
+
         }
     }
 }
