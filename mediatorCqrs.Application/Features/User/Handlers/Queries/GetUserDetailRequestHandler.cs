@@ -24,7 +24,7 @@ namespace mediatorCqrs.Application.Features.User.Handlers.Queries
 
         public async Task<UserDtos> Handle(GetUserDetailRequest request, CancellationToken cancellationToken)
         {
-            var user = await _userRepository.GetbyID(c => c.Id == request.Id);
+            var user = await _userRepository.GetbyID(request.Id);
             return _mapper.Map<UserDtos>(user);
         }
     }

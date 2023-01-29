@@ -19,7 +19,7 @@ namespace mediatorCqrs.UnitTest.Users.Queries
 
         public GetUserDetailTest()
         {
-            _mockrepo = new Mock<IUserRepository>();
+            _mockrepo = MockUserRepository.GetUserRepository();
             var mapperConfig = new MapperConfiguration(c =>
             {
                 c.AddProfile<MappingProfile>();
@@ -43,12 +43,11 @@ namespace mediatorCqrs.UnitTest.Users.Queries
         public async Task GetUserByIdTest()
         {
 
-            var expersion = _mockrepo.Setup(x => x.GetbyID(r => r.Id == _id)).ReturnsAsync(_user);
             var handler = new GetUserDetailRequestHandler(_mockrepo.Object, _mapper);
             var result = await handler.Handle(new GetUserDetailRequest() { Id = _id },
                 CancellationToken.None);
-            
 
+            
             Assert.Equal(1, result.Id);
         }
     }

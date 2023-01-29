@@ -48,7 +48,10 @@ namespace mediatorCqrs.UnitTest.Mock
                     
                     return user;
                 });
-            
+            var id = 1;
+            mockRepo.Setup(x => x.GetbyID(id)).ReturnsAsync(users[0]);
+
+
 
             return mockRepo;
         }

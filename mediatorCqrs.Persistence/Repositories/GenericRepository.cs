@@ -37,9 +37,9 @@ namespace mediatorCqrs.Persistence.Repositories
            return await _Dbset.ToListAsync();
         }
 
-        public async Task<T> GetbyID(Expression<Func<T , bool>> expression)
+        public async Task<T> GetbyID(int id)
         {
-            var user =await _Dbset.FirstOrDefaultAsync(expression);
+            var user =await _Dbset.FindAsync(id);
             return user;
         }
 
