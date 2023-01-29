@@ -42,12 +42,14 @@ namespace mediatorCqrs.UnitTest.Users.Queries
         [Fact]
         public async Task GetUserByIdTest()
         {
-
+            //Arange
             var handler = new GetUserDetailRequestHandler(_mockrepo.Object, _mapper);
+
+            //Act
             var result = await handler.Handle(new GetUserDetailRequest() { Id = _id },
                 CancellationToken.None);
 
-            
+            //Assert
             Assert.Equal(1, result.Id);
         }
     }
