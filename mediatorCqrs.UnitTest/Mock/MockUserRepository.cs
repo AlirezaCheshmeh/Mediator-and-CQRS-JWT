@@ -9,6 +9,7 @@ namespace mediatorCqrs.UnitTest.Mock
         public static Mock<IUserRepository> GetUserRepository()
         {
             
+            
             var users = new List<User>
             {
                 new User
@@ -22,7 +23,7 @@ namespace mediatorCqrs.UnitTest.Mock
                 },
                 new User
                 {
-                    Id = 1,
+                    Id = 2,
                     DateTime= DateTime.Now,
                     email = " alich@",
                     isActive= true,
@@ -32,6 +33,7 @@ namespace mediatorCqrs.UnitTest.Mock
             };
             var mockRepo = new Mock<IUserRepository>();
             mockRepo.Setup(r => r.GetAll()).ReturnsAsync(users);
+
             mockRepo.Setup(r=> r.Delete(It.IsAny<User>()))
                 .ReturnsAsync((User user) =>
                  {
@@ -43,8 +45,11 @@ namespace mediatorCqrs.UnitTest.Mock
                 .ReturnsAsync((User user) =>
                 {
                     users.Add(user);
+                    
                     return user;
                 });
+            
+
             return mockRepo;
         }
     }
