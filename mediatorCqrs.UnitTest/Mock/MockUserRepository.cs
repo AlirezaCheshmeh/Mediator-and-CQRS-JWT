@@ -40,6 +40,12 @@ namespace mediatorCqrs.UnitTest.Mock
                      users.Remove(user);
                      return true;
                  });
+            mockRepo.Setup(r => r.Update(It.IsAny<User>()))
+                .ReturnsAsync((User u) =>
+                {
+                    return true;
+                });
+              
 
             mockRepo.Setup(r => r.Create(It.IsAny<User>()))
                 .ReturnsAsync((User user) =>

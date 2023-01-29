@@ -58,5 +58,14 @@ namespace mediatorandCqrs.API
             return BadRequest("user not found");
             
         }
+
+
+        [HttpPut("UpdateUser")]
+        public async Task<ActionResult<bool>> UpdateUser(UserDtos user )
+        {
+            var command = new UpdateUserCommand { userDtos = user };
+            var response = await _mediator.Send(command);
+            return Ok(response);
+        }
     }
 }

@@ -43,12 +43,12 @@ namespace mediatorCqrs.Persistence.Repositories
             return user;
         }
 
-        public bool  Update(T entity)
+        public async Task<bool>  Update(T entity)
         {
             if (entity != null)
             {
                 _Dbset.Update(entity);
-                _context.SaveChanges();
+               await _context.SaveChangesAsync();
                 return true;
             }
             return false;
