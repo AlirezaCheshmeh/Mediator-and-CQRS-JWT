@@ -1,6 +1,8 @@
 
 
 using mediatorCqrs.Application;
+using mediatorCqrs.Application.Model.Identity;
+using mediatorCqrs.Identity;
 using mediatorCqrs.Persistence;
 using mediatorCqrs.Persistence.Configuration.Entities;
 
@@ -16,6 +18,9 @@ builder.Services.AddSwaggerGen();
 
 builder.Services.ConfigurationPersistenceService(builder.Configuration);
 builder.Services.ConfigurationApplicationService();
+builder.Services.AddIdentityService(builder.Configuration);
+
+builder.Configuration.GetSection("JWTsetting").Get<JWTsetting>();
 
 
 var app = builder.Build();
