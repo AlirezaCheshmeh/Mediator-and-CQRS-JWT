@@ -4,9 +4,11 @@ using Microsoft.AspNetCore.Mvc;
 using MediatR;
 using mediatorCqrs.Application.Features.User.Requests.Queries;
 using mediatorCqrs.Application.Features.User.Requests.Commands;
+using Microsoft.AspNetCore.Authorization;
 
 namespace mediatorandCqrs.API
 {
+    
     [Route("api/[controller]")]
     [ApiController]
     public class UserController : ControllerBase
@@ -18,7 +20,7 @@ namespace mediatorandCqrs.API
             _mediator = mediator;
         }
 
-
+        [Authorize(Roles ="admin")]
         [HttpGet("GetUserList")]
         public async Task<ActionResult<UserDtos>> GetUserList()
         {

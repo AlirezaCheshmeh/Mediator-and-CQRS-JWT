@@ -8,6 +8,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
+using System.Reflection.Metadata.Ecma335;
 using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
@@ -17,10 +18,11 @@ namespace mediatorCqrs.Identity.Services
     public class AuthenticationeJWTservice : IAthenticationJWTServices
     {
         private readonly DataContext _data;
+        private readonly IOptions<JWTsetting> jwtoption;
         private readonly IConfiguration _configuration;
         private readonly JWTsetting _jwtoption;
 
-        public AuthenticationeJWTservice(DataContext data , IOptions<JWTsetting> jwtoption ,IConfiguration configuration )
+        public AuthenticationeJWTservice(DataContext data, IOptions<JWTsetting> jwtoption , IConfiguration configuration)
         {
             _data = data;
             _configuration = configuration;
@@ -35,24 +37,22 @@ namespace mediatorCqrs.Identity.Services
             }
         }
 
-        public void CreatePasswordhash(string password, byte[] passwordhash, out byte[] passwordsalt)
-        {
-            throw new NotImplementedException();
-        }
+
 
         public string CreateToken(Customer customer)
         {
             List<Claim> claims = new List<Claim>
             {
-                new Claim(ClaimTypes.Name ,customer.username)
+                new Claim(ClaimTypes.Name ,customer.username),
+                new Claim(ClaimTypes.Role , "admin")
             };
-            var key =new SymmetricSecurityKey(Encoding.UTF8.GetBytes(
-                _jwtoption.key));
+            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(
+               _configuration.GetSection("JWTsetting:key").Value ));
             var cred = new SigningCredentials(key, SecurityAlgorithms.HmacSha512Signature);
             var token = new JwtSecurityToken(
                 claims: claims,
                 expires: DateTime.Now.AddDays(1),
-                signingCredentials : cred
+                signingCredentials: cred
                 );
             var jwt = new JwtSecurityTokenHandler().WriteToken(token);
             return jwt;
@@ -60,8 +60,8 @@ namespace mediatorCqrs.Identity.Services
 
         public async Task<Customer> CustomerExist(string username)
         {
-            var customerExist =await _data.Customers.FirstOrDefaultAsync(r => r.username == username);
-            if(customerExist != null)
+            var customerExist = await _data.Customers.FirstOrDefaultAsync(r => r.username == username);
+            if (customerExist != null)
             {
                 return customerExist;
             }
@@ -71,13 +71,14 @@ namespace mediatorCqrs.Identity.Services
 
         public async Task<string> Login(CustomersLoginDtos customersLogin)
         {
-            var customerexist =await CustomerExist(customersLogin.username);
+            var customerexist = await CustomerExist(customersLogin.username);
             if (customerexist != null)
             {
-                if(VerifyPassword(customersLogin.password , customerexist.passwordhash , customerexist.passwordsalt))
+                if (VerifyPassword(customersLogin.password, customerexist.passwordhash, customerexist.passwordsalt)==true)
                 {
-                   var t =   CreateToken(customerexist);
-                    return  t;
+                    var t = CreateToken(customerexist);
+                    return t;
+
                 }
                 var message = "not verify password";
                 return message;
@@ -85,16 +86,28 @@ namespace mediatorCqrs.Identity.Services
             return null;
         }
 
-        public bool VerifyPassword(string password, byte[]passwordhash, byte[]passwordsalt)
+        public async Task<Customer> register(CustomersLoginDtos customersLogin)
         {
-           
+            CreatePasswordhash(customersLogin.password, out byte[] passhash, out byte[] passsalt);
+            Customer cus = new Customer()
+            {
+                
+                passwordhash = passhash,
+                passwordsalt = passsalt ,
+                username = customersLogin.username
+            };
+            _data.Customers.Add(cus);
+            await _data.SaveChangesAsync();
+            return cus;
+        }
+
+        public bool VerifyPassword(string password, byte[] passwordhash, byte[] passwordsalt)
+        {
             using (var hmac = new HMACSHA512(passwordsalt))
             {
                 var ComputeHash = hmac.ComputeHash(Encoding.UTF8.GetBytes(password));
                 return ComputeHash.SequenceEqual(passwordhash);
             }
         }
-
-        
     }
 }
