@@ -13,6 +13,11 @@ namespace mediatorCqrs.Domain
         public byte[] passwordhash { get; set; }
 
         public byte[] passwordsalt { get; set; }
+
+
+        public string RefreshToken { get; set; } = string.Empty;
+        public DateTime DateCreate { get; set; }
+        public DateTime TokenExpieres { get; set; }
     }
 
 }

@@ -31,6 +31,7 @@ namespace mediatorandCqrs.API
 
 
         [HttpPost("CraeteUser")]
+
         public async Task<ActionResult<int>> Create([FromBody] CreateUserDtos user)
         {
             var command = new CreateUserCommand { createUserDtos = user };
