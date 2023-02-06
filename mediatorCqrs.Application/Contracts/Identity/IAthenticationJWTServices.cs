@@ -1,4 +1,5 @@
 ﻿using mediatorCqrs.Application.DTOs.CustomerDto;
+using mediatorCqrs.Application.DTOs.Referesh;
 using mediatorCqrs.Application.Model.Identity;
 using mediatorCqrs.Domain;
 
@@ -14,10 +15,20 @@ namespace mediatorCqrs.Application.Contracts.Identity
         void CreatePasswordhash(string password,out byte[] passwordhash, out byte[] passwordsalt);
         bool VerifyPassword(string password, byte[] passwordhash, byte[] passwordsalt);
         string CreateToken(Customer customer);
-        RefreshToken GenerateRefreshToken();
+        void GenerateRefreshToken(Refreshtoken refreshtoken);
 
 
-        Task<Customer> GetCustomerFromRefreshToken(string refto);
+        Task<RefreshTokenDTO> CheckRefrshToken(int id);
+
+        Refreshtoken GetToken(string r);
+
+        void updatetoken(int cusId ,string r );
+        
+
+
+
+
+    
     }
 
 }

@@ -1,5 +1,7 @@
-﻿using mediatorCqrs.Application.Contracts.Identity;
+﻿using AutoMapper;
+using mediatorCqrs.Application.Contracts.Identity;
 using mediatorCqrs.Application.DTOs.CustomerDto;
+using mediatorCqrs.Application.DTOs.Referesh;
 using mediatorCqrs.Application.Model.Identity;
 using mediatorCqrs.Domain;
 using mediatorCqrs.Persistence;
@@ -19,14 +21,25 @@ namespace mediatorCqrs.Identity.Services
     {
         private readonly DataContext _data;
         private readonly IConfiguration _configuration;
-       
+        private readonly IMapper _mapper;
 
-        public AuthenticationeJWTservice(DataContext data, IConfiguration configuration)
+        public AuthenticationeJWTservice(DataContext data, IConfiguration configuration , IMapper mapper)
         {
             _data = data;
             _configuration = configuration;
-            
+            _mapper = mapper;
         }
+
+        public async Task<RefreshTokenDTO> CheckRefrshToken(int id)
+        {
+            var refershAndcus = await _data.refreshtokens
+                .AsNoTracking()
+                .Include(x => x.customer)
+                .FirstOrDefaultAsync(x => x.customer.Id == id);
+            var refreshDto = _mapper.Map<RefreshTokenDTO>(refershAndcus);
+            return refreshDto;
+        }
+
         public void CreatePasswordhash(string password, out byte[] passwordhash, out byte[] passwordsalt)
         {
             using (var hmac = new HMACSHA512())
@@ -42,11 +55,12 @@ namespace mediatorCqrs.Identity.Services
         {
             List<Claim> claims = new List<Claim>
             {
+                new Claim(ClaimTypes.NameIdentifier , customer.Id.ToString()),
                 new Claim(ClaimTypes.Name ,customer.username),
                 new Claim(ClaimTypes.Role , "admin")
             };
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(
-               _configuration.GetSection("JWTsetting:key").Value ));
+               _configuration.GetSection("JWTsetting:key").Value));
             var cred = new SigningCredentials(key, SecurityAlgorithms.HmacSha512Signature);
             var token = new JwtSecurityToken(
                 claims: claims,
@@ -68,21 +82,18 @@ namespace mediatorCqrs.Identity.Services
 
         }
 
-        public RefreshToken GenerateRefreshToken()
+        public void GenerateRefreshToken(Refreshtoken refreshtoken)
         {
-            var refreshToken = new RefreshToken
-            {
-                Token = Convert.ToBase64String(RandomNumberGenerator.GetBytes(64)),
-                Expires = DateTime.Now.AddMinutes(2),
-                Create = DateTime.Now
-            };
-            return refreshToken;
+
+            _data.refreshtokens.Add(refreshtoken);
+            _data.SaveChanges();
+
         }
 
-        public async Task<Customer> GetCustomerFromRefreshToken(string refto)
+        public Refreshtoken GetToken(string r)
         {
-        var cus =  await _data.Customers.FirstOrDefaultAsync(x=>x.RefreshToken==refto);
-            return cus;
+           var result =  _data.refreshtokens.FirstOrDefault(x=>x.Rtoken == r);
+            return result;
         }
 
         public async Task<string> Login(CustomersLoginDtos customersLogin)
@@ -90,14 +101,14 @@ namespace mediatorCqrs.Identity.Services
             var customerexist = await CustomerExist(customersLogin.username);
             if (customerexist != null)
             {
-                if (VerifyPassword(customersLogin.password, customerexist.passwordhash, customerexist.passwordsalt)==true)
+                if (VerifyPassword(customersLogin.password, customerexist.passwordhash, customerexist.passwordsalt) == true)
                 {
                     var t = CreateToken(customerexist);
-                   
+
                     return t;
 
                 }
-                string message = "not verify password" ;
+                string message = "not verify password";
                 return message;
             }
             return null;
@@ -106,26 +117,31 @@ namespace mediatorCqrs.Identity.Services
         public async Task<Customer> register(CustomersLoginDtos customersLogin)
         {
             CreatePasswordhash(customersLogin.password, out byte[] passhash, out byte[] passsalt);
-            var refreshToken = GenerateRefreshToken();
 
             Customer cus = new Customer()
             {
-                
                 passwordhash = passhash,
-                passwordsalt = passsalt ,
+                passwordsalt = passsalt,
                 username = customersLogin.username,
-                RefreshToken = refreshToken.Token ,
-                DateCreate = refreshToken.Create,
-                TokenExpieres = refreshToken.Expires
-                
+
             };
 
             _data.Customers.Add(cus);
             await _data.SaveChangesAsync();
+
             return cus;
         }
 
-       
+        public void updatetoken(int cusId,string r)
+        {
+            var result = _data.refreshtokens.FirstOrDefault(x => x.Rtoken == r);
+            result.Create = DateTime.Now;
+            result.Expire = DateTime.Now.AddMinutes(2);
+            result.Rtoken = Convert.ToBase64String(RandomNumberGenerator.GetBytes(64));
+            result.cusId = cusId;
+             _data.SaveChanges();
+        }
+
         public bool VerifyPassword(string password, byte[] passwordhash, byte[] passwordsalt)
         {
             using (var hmac = new HMACSHA512(passwordsalt))
@@ -135,6 +151,6 @@ namespace mediatorCqrs.Identity.Services
             }
         }
 
-       
+
     }
 }

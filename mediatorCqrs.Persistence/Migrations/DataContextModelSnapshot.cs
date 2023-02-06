@@ -30,16 +30,6 @@ namespace mediatorCqrs.Persistence.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<DateTime>("DateCreate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("RefreshToken")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("TokenExpieres")
-                        .HasColumnType("datetime2");
-
                     b.Property<byte[]>("passwordhash")
                         .IsRequired()
                         .HasColumnType("varbinary(max)");
@@ -55,6 +45,35 @@ namespace mediatorCqrs.Persistence.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Customers");
+                });
+
+            modelBuilder.Entity("mediatorCqrs.Domain.Refreshtoken", b =>
+                {
+                    b.Property<int>("RefID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("RefID"));
+
+                    b.Property<DateTime>("Create")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("Expire")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Rtoken")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("cusId")
+                        .HasColumnType("int");
+
+                    b.HasKey("RefID");
+
+                    b.HasIndex("cusId")
+                        .IsUnique();
+
+                    b.ToTable("refreshtokens");
                 });
 
             modelBuilder.Entity("mediatorCqrs.Domain.User", b =>
@@ -86,6 +105,23 @@ namespace mediatorCqrs.Persistence.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("User");
+                });
+
+            modelBuilder.Entity("mediatorCqrs.Domain.Refreshtoken", b =>
+                {
+                    b.HasOne("mediatorCqrs.Domain.Customer", "customer")
+                        .WithOne("refreshToken")
+                        .HasForeignKey("mediatorCqrs.Domain.Refreshtoken", "cusId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("customer");
+                });
+
+            modelBuilder.Entity("mediatorCqrs.Domain.Customer", b =>
+                {
+                    b.Navigation("refreshToken")
+                        .IsRequired();
                 });
 #pragma warning restore 612, 618
         }

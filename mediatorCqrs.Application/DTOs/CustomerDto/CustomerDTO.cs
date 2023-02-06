@@ -1,26 +1,20 @@
-﻿using System;
+﻿using mediatorCqrs.Application.DTOs.Referesh;
+using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace mediatorCqrs.Domain
+namespace mediatorCqrs.Application.DTOs.CustomerDto
 {
-    public class Customer
+    public class CustomerDTO
     {
-        [Key]
         public int Id { get; set; }
         public string username { get; set; } = string.Empty;
         public byte[] passwordhash { get; set; }
 
         public byte[] passwordsalt { get; set; }
 
-
-        public virtual Refreshtoken refreshToken { get; set; }
-
-
+        
     }
-
 }

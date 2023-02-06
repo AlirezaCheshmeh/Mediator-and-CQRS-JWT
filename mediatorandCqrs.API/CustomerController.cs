@@ -1,15 +1,8 @@
 ﻿using mediatorCqrs.Application.Contracts.Identity;
 using mediatorCqrs.Application.DTOs.CustomerDto;
-using mediatorCqrs.Application.Model.Identity;
 using mediatorCqrs.Domain;
-using mediatorCqrs.Persistence;
-using Microsoft.AspNetCore.DataProtection;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.IdentityModel.Tokens;
-using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
-using System.Text;
+using System.Security.Cryptography;
 
 namespace mediatorandCqrs.API
 {
@@ -18,7 +11,7 @@ namespace mediatorandCqrs.API
     public class CustomerController : ControllerBase
     {
         private readonly IAthenticationJWTServices _athentication;
-        
+
 
         public CustomerController(IAthenticationJWTServices athentication)
         {
@@ -30,6 +23,7 @@ namespace mediatorandCqrs.API
         public async Task<ActionResult<Customer>> Register(CustomersLoginDtos loginDtos)
         {
             var result = await _athentication.register(loginDtos);
+           
             return Ok(result);
         }
 
@@ -38,14 +32,43 @@ namespace mediatorandCqrs.API
         public async Task<ActionResult<string>> login(CustomersLoginDtos loginDtos)
         {
             var s = await _athentication.Login(loginDtos);
-            var refershToekn = _athentication.GenerateRefreshToken();
-            SetRefreshToken(refershToekn);
 
+            var cus = await _athentication.CustomerExist(loginDtos.username);
+            var response = await _athentication.CheckRefrshToken(cus.Id);
+            if (response.Rtoken == null)
+            {
+                var refreshToken = new Refreshtoken
+                {
+                    Rtoken = Convert.ToBase64String(RandomNumberGenerator.GetBytes(64)),
+                    Expire = DateTime.Now.AddMinutes(2),
+                    Create = DateTime.Now,
+                    RefID = cus.Id
+                };
+                _athentication.GenerateRefreshToken(refreshToken);
+                SetRefreshToken(refreshToken.Expire, refreshToken.Rtoken);
+
+            }
+            SetRefreshToken(response.Expire, response.Rtoken);
+            //}
+            //else if(response.Expire < DateTime.Now)
+            //{
+            //    var refreshToken = new Refreshtoken
+            //    {
+            //        Rtoken = Convert.ToBase64String(RandomNumberGenerator.GetBytes(64)),
+            //        Expire = DateTime.Now.AddMinutes(2),
+            //        Create = DateTime.Now,
+            //        RefID = cus.Id
+            //    };
+            //    _athentication.updaterefrsh(refreshToken);
+            //    SetRefreshToken(refreshToken.Expire, response.Rtoken);
+            //}
+            //else
+            //{
+            //    SetRefreshToken(response.Expire, response.Rtoken);
+            //}
 
 
             return Ok(s);
-
-
         }
 
         [HttpPost("RefershToken")]
@@ -53,41 +76,28 @@ namespace mediatorandCqrs.API
         {
 
             var refresh = Request.Cookies["refreshToken"];
-            var cus =await _athentication.GetCustomerFromRefreshToken(refresh);
-            
-
-            if(cus == null)
+            var RefreshROW= _athentication.GetToken(refresh);
+           var fullrefandCus =await _athentication.CheckRefrshToken(RefreshROW.cusId);
+            if (RefreshROW.Expire < DateTime.Now)
             {
-                return Unauthorized("Token not valid");
+               _athentication.updatetoken(RefreshROW.cusId , refresh);
+               var cus = await _athentication.CustomerExist(fullrefandCus.customerDTO.username);
+               var token = _athentication.CreateToken(cus);
+                return Unauthorized($"Token expierd/ newToken: {token}");
             }
-            else if ( cus.TokenExpieres < DateTime.Now)
-            {
-                return Unauthorized("Token expierd");
-            }
-            string token = _athentication.CreateToken(cus);
-            var newrefersh = _athentication.GenerateRefreshToken();
-            SetRefreshToken(newrefersh);
-            Customer c = new Customer
-            {
-                RefreshToken = newrefersh.Token ,
-                DateCreate = newrefersh.Create ,
-                TokenExpieres = newrefersh.Expires
-            };
-            
-
-            return Ok(token);
+            return Ok(refresh);
         }
 
 
 
-        private void SetRefreshToken(RefreshToken refreshToken)
+        private void SetRefreshToken(DateTime ex , string refersh)
         {
             var CookieOption = new CookieOptions
             {
                 HttpOnly = true,
-                Expires = refreshToken.Expires
+                Expires = DateTime.Now.AddMinutes(2)
             };
-            Response.Cookies.Append("refreshToken", refreshToken.Token, CookieOption);
+            Response.Cookies.Append("refreshToken", refersh, CookieOption);
         }
 
     }
